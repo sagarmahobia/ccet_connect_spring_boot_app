@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping(path = "/api/v1/user/request_otp", method = RequestMethod.POST)
+    @RequestMapping(path = "/api/v1/public/user/request_otp", method = RequestMethod.POST)
     public OtpStatus register(@RequestBody OtpModel otpModel) {
         String email = otpModel.getEmail();
         OtpStatus otpStatus = new OtpStatus();
