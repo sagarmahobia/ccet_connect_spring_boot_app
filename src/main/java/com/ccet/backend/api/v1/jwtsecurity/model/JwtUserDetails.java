@@ -1,25 +1,21 @@
 package com.ccet.backend.api.v1.jwtsecurity.model;
 
-import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+
 public class JwtUserDetails implements UserDetails {
 
-    private final String userName;
-    private final Long id;
+    private final String firstName;
+    private final String lastName;
+    private int id;
+
 
     public JwtUserDetails(JwtUser jwtUser) {
-        this.userName = jwtUser.getUserName();
+        this.firstName = jwtUser.getFirstName();
+        this.lastName = jwtUser.getLastName();
         this.id = jwtUser.getId();
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     @Override
@@ -34,7 +30,23 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userName;
+        return firstName + " " + lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

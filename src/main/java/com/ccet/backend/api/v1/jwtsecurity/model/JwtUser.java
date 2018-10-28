@@ -1,24 +1,31 @@
 package com.ccet.backend.api.v1.jwtsecurity.model;
 
 public class JwtUser {
-    private String userName;
-    private long id;
+    private String firstName;
+    private String lastName;
+    private int id;
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-
-    public String getUserName() {
-        return userName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public long getId() {
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 }

@@ -5,25 +5,56 @@
  */
 package com.ccet.backend.api.v1.services.user;
 
+import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
+import com.ccet.backend.api.v1.models.usermodels.RegistrableUser;
 import com.ccet.backend.api.v1.repository.UserRepository;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
+
 /**
- *
  * @author SAGAR MAHOBIA
  */
 @Service
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public String saveTempEmail(String email) {
-        String otp = String.format("%04d", new Random().nextInt(10000));
-        userRepository.saveTempEmail(email, otp);
-        return otp;
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
+    public void saveTempEmail(String email) {
+        String otp = String.format("%04d", new Random().nextInt(10000));
+        userRepository.saveTempEmail(email, otp);
+    }
+
+    public int verifyOtp(String email, String otp) {
+        int id = userRepository.verifyOtp(email, otp);
+        if (id == -1) {
+            userRepository.incrementAttempts(email);
+        } else {
+            userRepository.setVerified(id);
+        }
+        return id;
+    }
+
+    public void saveAppUser(RegistrableUser registrableUser) {
+        userRepository.registerNewUser(registrableUser);
+
+    }
+
+    public int verifyAndRegisterUser(RegistrableUser registrableUser) {
+        if (userRepository.verifyRegistrableUser(registrableUser.getTemp_id(), registrableUser.getEmail())) {
+            return userRepository.registerNewUser(registrableUser);
+        }
+        return -1;
+    }
+
+    public JwtUser signInUser(String email, String password) {
+
+        return userRepository.verifySignInCreds(email, password);
+    }
 }

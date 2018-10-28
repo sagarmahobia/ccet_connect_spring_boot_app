@@ -6,37 +6,32 @@
 package com.ccet.backend.api.v1.jwtsecurity.security;
 
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
 /**
- *
  * @author SAGAR MAHOBIA
  */
 @Component
 public class JwtUtil {
 
-    public JwtUser validate(String token) {
-        //todo change jwtUserBean for extracted token
+    private static final String signingKey = "MyKey_rAnDoM";
+
+    JwtUser validate(String token) {
         JwtUser jwtUser = null;
         try {
             Claims body = Jwts.parser()
-                    .setSigningKey("youtube")
+                    .setSigningKey(signingKey)
                     .parseClaimsJws(token)
                     .getBody();
 
             jwtUser = new JwtUser();
 
-            jwtUser.setUserName(body.getSubject());
-            jwtUser.setId(Long.parseLong((String) body.get("userId")));
-        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
-
+            jwtUser.setFirstName(body.get("firstName").toString());
+            jwtUser.setLastName(body.get("lastName").toString());
+            jwtUser.setId(Integer.parseInt(body.getSubject()));
+        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException ignored) {
+            //todo handle error.
         }
 
         return jwtUser;
@@ -44,14 +39,14 @@ public class JwtUtil {
 
     public String generate(JwtUser jwtUser) {
 
-//todo change token gen
-        Claims claims = Jwts.claims()
-                .setSubject(jwtUser.getUserName());
-        claims.put("userId", String.valueOf(jwtUser.getId()));
+        Claims claims = Jwts.claims().setSubject(String.valueOf(jwtUser.getId()));
+        claims.put("firstName", jwtUser.getFirstName());
+        claims.put("lastName", jwtUser.getLastName());
+
 
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, "youtube")
+                .signWith(SignatureAlgorithm.HS512, signingKey)
                 .compact();
     }
 }
