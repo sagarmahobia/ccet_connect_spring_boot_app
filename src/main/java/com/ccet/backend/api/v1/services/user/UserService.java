@@ -6,7 +6,7 @@
 package com.ccet.backend.api.v1.services.user;
 
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
-import com.ccet.backend.api.v1.models.usermodels.RegistrableUser;
+import com.ccet.backend.api.v1.models.commonmodels.SignUpModel;
 import com.ccet.backend.api.v1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,10 +26,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void saveTempEmail(String email) {
-        String otp = String.format("%04d", new Random().nextInt(10000));
-        userRepository.saveTempEmail(email, otp);
-    }
 
     public int verifyOtp(String email, String otp) {
         int id = userRepository.verifyOtp(email, otp);
@@ -41,20 +37,25 @@ public class UserService {
         return id;
     }
 
-    public void saveAppUser(RegistrableUser registrableUser) {
-        userRepository.registerNewUser(registrableUser);
-
-    }
-
-    public int verifyAndRegisterUser(RegistrableUser registrableUser) {
-        if (userRepository.verifyRegistrableUser(registrableUser.getTemp_id(), registrableUser.getEmail())) {
-            return userRepository.registerNewUser(registrableUser);
-        }
-        return -1;
-    }
 
     public JwtUser signInUser(String email, String password) {
 
         return userRepository.verifySignInCreds(email, password);
+    }
+
+    public boolean signUpUser(SignUpModel signUpModel) {
+        int userId = userRepository.saveUser(signUpModel);
+
+        if (userId != -1) {
+            String otp = String.format("%04d", new Random().nextInt(10000));
+            userRepository.saveOtp(userId, otp);
+            //todo send email
+            return true;
+        }
+        return false;
+    }
+
+    public JwtUser getUserDetail(int id) {
+        return userRepository.getJwtUser(id);
     }
 }
