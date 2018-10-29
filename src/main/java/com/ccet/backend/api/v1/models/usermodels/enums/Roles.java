@@ -14,7 +14,8 @@ public enum Roles {
     Faculty(2),
     Management(3),
     Student(4),
-    Other(5);
+    Admin(5),
+    Other(6);
     private final int roleId;
 
     Roles(int roleId) {
