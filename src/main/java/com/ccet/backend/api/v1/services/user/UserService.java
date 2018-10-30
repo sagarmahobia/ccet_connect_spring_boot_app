@@ -8,6 +8,7 @@ package com.ccet.backend.api.v1.services.user;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.models.commonmodels.SignUpModel;
 import com.ccet.backend.api.v1.repository.UserRepository;
+import com.ccet.backend.api.v1.services.mail.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,12 @@ import java.util.Random;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final MailService mailService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, MailService mailService) {
         this.userRepository = userRepository;
+        this.mailService = mailService;
     }
 
 
@@ -49,7 +52,7 @@ public class UserService {
         if (userId != -1) {
             String otp = String.format("%04d", new Random().nextInt(10000));
             userRepository.saveOtp(userId, otp);
-            //todo send email
+            mailService.sendOtp(signUpModel.getEmail(), otp);//sends mail
             return true;
         }
         return false;

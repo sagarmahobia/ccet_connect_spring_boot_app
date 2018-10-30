@@ -1,4 +1,4 @@
-package com.ccet.backend.api.v1.models.usermodels;
+package com.ccet.backend.api.v1.models.commonmodels;
 
 public class SignInUser {
 
