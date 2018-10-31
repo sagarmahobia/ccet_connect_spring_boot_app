@@ -5,9 +5,11 @@
  */
 package com.ccet.backend.api.v1.repository;
 
+import com.ccet.backend.api.v1.exceptions.EmailAlreadyUsedException;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.models.commonmodels.SignUpModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -107,7 +109,6 @@ public class UserRepository {
             jwtUser.setLastName(lastName);
 
             return jwtUser;
-
         }
 
         return null;
@@ -116,20 +117,22 @@ public class UserRepository {
     public int saveUser(SignUpModel signUpModel) {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
+        try {
+            jdbcTemplate.update((conn) -> {
 
-        jdbcTemplate.update((conn) -> {
+                PreparedStatement pstmt = conn.prepareStatement(SQL.SIGN_UP, Statement.RETURN_GENERATED_KEYS);
 
-            PreparedStatement pstmt = conn.prepareStatement(SQL.SIGN_UP, Statement.RETURN_GENERATED_KEYS);
-
-            pstmt.setString(1, signUpModel.getEmail());
-            pstmt.setString(2, signUpModel.getFirstName());
-            pstmt.setString(3, signUpModel.getLastName());
-            pstmt.setString(4, signUpModel.getAdmissionYear());
-            pstmt.setInt(5, signUpModel.getAdmissionSemester());
-            pstmt.setString(6, signUpModel.getPassWord());
-            return pstmt;
-        }, keyHolder);
-
+                pstmt.setString(1, signUpModel.getEmail());
+                pstmt.setString(2, signUpModel.getFirstName());
+                pstmt.setString(3, signUpModel.getLastName());
+                pstmt.setString(4, signUpModel.getAdmissionYear());
+                pstmt.setInt(5, signUpModel.getAdmissionSemester());
+                pstmt.setString(6, signUpModel.getPassWord());
+                return pstmt;
+            }, keyHolder);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyUsedException();
+        }
         Number key = keyHolder.getKey();
         return (key != null) ? key.intValue() : -1;
     }

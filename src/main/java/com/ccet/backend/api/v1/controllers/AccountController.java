@@ -5,6 +5,9 @@
  */
 package com.ccet.backend.api.v1.controllers;
 
+import com.ccet.backend.api.v1.exceptions.InternalServerException;
+import com.ccet.backend.api.v1.exceptions.InvalidInputException;
+import com.ccet.backend.api.v1.exceptions.UserNotFoundException;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtUtil;
 import com.ccet.backend.api.v1.models.commonmodels.*;
@@ -43,7 +46,6 @@ public class AccountController {
         int admissionSem = signUpModel.getAdmissionSemester();
         String passWord = signUpModel.getPassWord();
 
-        Status status = new Status();
 
         if (firstName.isEmpty()
                 || lastName.isEmpty()
@@ -52,19 +54,14 @@ public class AccountController {
                 || !(admissionYear.length() == 4)
                 || !(admissionSem >= 1 && admissionSem <= 8)
         ) {
-            status.setStatus("failure");
-            return status;
+            throw new InvalidInputException();
         }
 
-        boolean b = userService.signUpUser(signUpModel);
+        userService.signUpUser(signUpModel);
 
-        if (b) {
-            status.setStatus("success");
-            return status;
-        } else {
-            status.setStatus("failure");
-            return status;
-        }
+        Status status = new Status();
+        status.setStatus("success");
+        return status;
     }
 
     @RequestMapping(path = "/api/v1/public/user/verify_otp", method = RequestMethod.POST)
@@ -72,26 +69,27 @@ public class AccountController {
         String email = otpModel.getEmail();
         String otp = otpModel.getOtp();
 
-        String token = null;
-        AuthStatus authStatus = new AuthStatus();
-        authStatus.setAuthenticated(false);
 
         try {
             Integer.parseInt(otp);
         } catch (NumberFormatException e) {
-            return authStatus;
+            throw new InvalidInputException();
         }
 
         if (!validatorService.isValidEmail(email) || !(otp.length() == 4)) {
-            return authStatus;
+            throw new InvalidInputException();
         }
 
         int id = userService.verifyOtp(email, otp);
-        if (id != -1) {
-            token = jwtUtil.generate(userService.getUserDetail(id));
+
+        String token = jwtUtil.generate(userService.getUserDetail(id));
+        if (token == null) {
+            throw new InternalServerException("jwtUtil.generate(token) failed");
         }
+
+        AuthStatus authStatus = new AuthStatus();
         authStatus.setToken(token);
-        authStatus.setAuthenticated(token != null);
+        authStatus.setAuthenticated(true);
         return authStatus;
     }
 
@@ -101,20 +99,19 @@ public class AccountController {
 
         String email = signInUser.getEmail();
         String password = signInUser.getPassword();
-        AuthStatus authStatus = new AuthStatus();
 
         if (!validatorService.isValidEmail(email) || !validatorService.isValidPassword(password)) {
-            authStatus.setAuthenticated(false);
-            return authStatus;
+            throw new InvalidInputException();
         }
 
         JwtUser jwtUser = userService.signInUser(email, password);
-
-        boolean authenticated = jwtUser != null;
-        authStatus.setAuthenticated(authenticated);
-        if (authenticated) {
-            authStatus.setToken(jwtUtil.generate(jwtUser));
+        if (jwtUser == null) {
+            throw new UserNotFoundException();
         }
+
+        AuthStatus authStatus = new AuthStatus();
+        authStatus.setAuthenticated(true);
+        authStatus.setToken(jwtUtil.generate(jwtUser));
         return authStatus;
     }
 

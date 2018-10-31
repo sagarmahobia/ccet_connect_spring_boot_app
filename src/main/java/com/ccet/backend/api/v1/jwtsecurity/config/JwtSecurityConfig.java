@@ -4,7 +4,6 @@ import com.ccet.backend.api.v1.jwtsecurity.security.JwtAuthenticationEntryPoint;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtAuthenticationProvider;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtAuthenticationTokenFilter;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtSuccessHandler;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,15 +16,21 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Collections;
+
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 @Configuration
 public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final JwtAuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationEntryPoint entryPoint;
+
     @Autowired
-    private JwtAuthenticationProvider authenticationProvider;
-    @Autowired
-    private JwtAuthenticationEntryPoint entryPoint;
+    public JwtSecurityConfig(JwtAuthenticationProvider authenticationProvider, JwtAuthenticationEntryPoint entryPoint) {
+        this.authenticationProvider = authenticationProvider;
+        this.entryPoint = entryPoint;
+    }
 
     @Bean
     public JwtAuthenticationTokenFilter authenticationTokenFilter() {

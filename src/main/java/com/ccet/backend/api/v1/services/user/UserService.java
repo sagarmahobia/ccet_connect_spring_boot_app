@@ -5,6 +5,8 @@
  */
 package com.ccet.backend.api.v1.services.user;
 
+import com.ccet.backend.api.v1.exceptions.InvalidCredentialsException;
+import com.ccet.backend.api.v1.exceptions.UnknownDatabaseException;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.models.commonmodels.SignUpModel;
 import com.ccet.backend.api.v1.repository.UserRepository;
@@ -34,10 +36,12 @@ public class UserService {
         int id = userRepository.verifyOtp(email, otp);
         if (id == -1) {
             userRepository.incrementAttempts(email);
-        } else {
-            userRepository.setVerified(id);
+            throw new InvalidCredentialsException();
         }
+
+        userRepository.setVerified(id);
         return id;
+
     }
 
 
@@ -46,16 +50,17 @@ public class UserService {
         return userRepository.verifySignInCreds(email, password);
     }
 
-    public boolean signUpUser(SignUpModel signUpModel) {
+    public void signUpUser(SignUpModel signUpModel) {
         int userId = userRepository.saveUser(signUpModel);
 
         if (userId != -1) {
             String otp = String.format("%04d", new Random().nextInt(10000));
             userRepository.saveOtp(userId, otp);
             mailService.sendOtp(signUpModel.getEmail(), otp);//sends mail
-            return true;
+        } else {
+            throw new UnknownDatabaseException();
         }
-        return false;
+
     }
 
     public JwtUser getUserDetail(int id) {
