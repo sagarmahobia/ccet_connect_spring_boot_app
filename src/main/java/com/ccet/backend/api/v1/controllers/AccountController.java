@@ -89,7 +89,6 @@ public class AccountController {
 
         AuthStatus authStatus = new AuthStatus();
         authStatus.setToken(token);
-        authStatus.setAuthenticated(true);
         return authStatus;
     }
 
@@ -110,7 +109,6 @@ public class AccountController {
         }
 
         AuthStatus authStatus = new AuthStatus();
-        authStatus.setAuthenticated(true);
         authStatus.setToken(jwtUtil.generate(jwtUser));
         return authStatus;
     }
