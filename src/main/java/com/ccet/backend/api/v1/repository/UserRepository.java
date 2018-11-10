@@ -8,6 +8,7 @@ package com.ccet.backend.api.v1.repository;
 import com.ccet.backend.api.v1.exceptions.EmailAlreadyUsedException;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.models.commonmodels.SignUpModel;
+import com.ccet.backend.api.v1.models.user.UserDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -57,23 +58,46 @@ public class UserRepository {
 
         String USER_DETAIL = "SELECT * FROM `user` WHERE `user_id` = ?";
 
+
     }
 
-    public JwtUser getJwtUser(int id) {
-        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(SQL.USER_DETAIL, id);
+    public UserDetail getUserDetail(int user_id) {
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(SQL.USER_DETAIL, user_id);
         if (sqlRowSet.first()) {
+
             String first_name = sqlRowSet.getString("first_name");
             String last_name = sqlRowSet.getString("last_name");
+            String email = sqlRowSet.getString("email");
+            String collegeEmail = sqlRowSet.getString("college_email");
+            String admissionYear = sqlRowSet.getString("admission_year");
+            int admissionSemester = sqlRowSet.getInt("admission_semester");
 
-            JwtUser jwtUser = new JwtUser();
-            jwtUser.setId(id);
-            jwtUser.setFirstName(first_name);
-            jwtUser.setLastName(last_name);
+            UserDetail userDetail = new UserDetail();
+            userDetail.setUserId(user_id);
+            userDetail.setFirstName(first_name);
+            userDetail.setLastName(last_name);
+            userDetail.setEmail(email);
+            userDetail.setCollegeEmail(collegeEmail);
+            userDetail.setAdmissionYear(admissionYear);
+            userDetail.setAdmissionSemester(admissionSemester);
 
-            return jwtUser;
+            return userDetail;
         } else {
             return null;
         }
+    }
+
+    public JwtUser getJwtUser(int id) {
+
+        UserDetail userDetail = getUserDetail(id);
+        if (userDetail != null) {
+            JwtUser jwtUser = new JwtUser();
+            jwtUser.setId(id);
+            jwtUser.setFirstName(userDetail.getFirstName());
+            jwtUser.setLastName(userDetail.getLastName());
+            return jwtUser;
+        }
+        return null;
     }
 
     public int verifyOtp(String email, String otp) {
