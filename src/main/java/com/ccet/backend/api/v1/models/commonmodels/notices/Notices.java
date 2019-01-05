@@ -1,5 +1,7 @@
 package com.ccet.backend.api.v1.models.commonmodels.notices;
 
+import com.ccet.backend.api.v1.hibernate.entities.Notice;
+
 import java.util.List;
 
 /**

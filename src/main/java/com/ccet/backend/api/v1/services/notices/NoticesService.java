@@ -1,9 +1,9 @@
 package com.ccet.backend.api.v1.services.notices;
 
 
-import com.ccet.backend.api.v1.models.commonmodels.notices.Notice;
+import com.ccet.backend.api.v1.hibernate.entities.Notice;
+import com.ccet.backend.api.v1.hibernate.repositories.NoticesRepository;
 import com.ccet.backend.api.v1.models.commonmodels.notices.Notices;
-import com.ccet.backend.api.v1.repository.NoticesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

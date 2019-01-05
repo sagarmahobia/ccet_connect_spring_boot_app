@@ -26,9 +26,6 @@ public class JwtUtil {
                     .getBody();
 
             jwtUser = new JwtUser();
-
-            jwtUser.setFirstName(body.get("firstName").toString());
-            jwtUser.setLastName(body.get("lastName").toString());
             jwtUser.setId(Integer.parseInt(body.getSubject()));
         } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException ignored) {
             //todo handle error.
@@ -40,8 +37,6 @@ public class JwtUtil {
     public String generate(JwtUser jwtUser) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(jwtUser.getId()));
-        claims.put("firstName", jwtUser.getFirstName());
-        claims.put("lastName", jwtUser.getLastName());
 
 
         return Jwts.builder()

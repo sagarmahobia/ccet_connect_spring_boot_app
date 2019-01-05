@@ -2,6 +2,7 @@ package com.ccet.backend.api.v1.services.mail;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,7 +15,7 @@ public class MailService {
     private TaskExecutor taskExecutor;
 
     @Autowired
-    public MailService(JavaMailSender emailSender, TaskExecutor taskExecutor) {
+    public MailService(JavaMailSender emailSender, @Qualifier("mail") TaskExecutor taskExecutor) {
         this.emailSender = emailSender;
         this.taskExecutor = taskExecutor;
     }

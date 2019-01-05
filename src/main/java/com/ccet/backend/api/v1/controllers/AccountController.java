@@ -8,9 +8,11 @@ package com.ccet.backend.api.v1.controllers;
 import com.ccet.backend.api.v1.exceptions.InternalServerException;
 import com.ccet.backend.api.v1.exceptions.InvalidInputException;
 import com.ccet.backend.api.v1.exceptions.UserNotFoundException;
+import com.ccet.backend.api.v1.hibernate.entities.Otp;
+import com.ccet.backend.api.v1.hibernate.entities.User;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtUtil;
-import com.ccet.backend.api.v1.models.commonmodels.*;
+import com.ccet.backend.api.v1.models.commonmodels.AuthStatus;
 import com.ccet.backend.api.v1.services.ValidatorService;
 import com.ccet.backend.api.v1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,49 +40,34 @@ public class AccountController {
 
 
     @RequestMapping(path = "/api/v1/public/user/sign_up", method = RequestMethod.POST)
-    public Status signUp(@RequestBody SignUpModel signUpModel) {
-        String email = signUpModel.getEmail();
-        String firstName = signUpModel.getFirstName();
-        String lastName = signUpModel.getLastName();
-        String admissionYear = signUpModel.getAdmissionYear();
-        int admissionSem = signUpModel.getAdmissionSemester();
-        String passWord = signUpModel.getPassWord();
+    public Otp signUp(@RequestBody User user) {
+        user.setId(0);
+        user.setVerified(false);
+        String email = user.getEmail();
+        String passWord = user.getPassWord();
 
-
-        if (firstName.isEmpty()
-                || lastName.isEmpty()
-                || !validatorService.isValidEmail(email)
-                || !validatorService.isValidPassword(passWord)
-                || !(admissionYear.length() == 4)
-                || !(admissionSem >= 1 && admissionSem <= 8)
-        ) {
+        if (!validatorService.isValidEmail(email) || !validatorService.isValidPassword(passWord)) {
             throw new InvalidInputException();
         }
 
-        userService.signUpUser(signUpModel);
-
-        Status status = new Status();
-        status.setStatus("success");
-        return status;
+        return userService.signUpUser(user);
     }
 
     @RequestMapping(path = "/api/v1/public/user/verify_otp", method = RequestMethod.POST)
-    public AuthStatus verifyOtp(@RequestBody OtpModel otpModel) {
-        String email = otpModel.getEmail();
-        String otp = otpModel.getOtp();
-
+    public AuthStatus verifyOtp(@RequestBody Otp otp) {
+        String otpString = otp.getOtp();
 
         try {
-            Integer.parseInt(otp);
+            Integer.parseInt(otpString);
         } catch (NumberFormatException e) {
             throw new InvalidInputException();
         }
 
-        if (!validatorService.isValidEmail(email) || !(otp.length() == 4)) {
+        if (otpString.length() != 4) {
             throw new InvalidInputException();
         }
 
-        int id = userService.verifyOtp(email, otp);
+        int id = userService.verifyOtp(otp);
 
         String token = jwtUtil.generate(userService.getUserDetail(id));
         if (token == null) {
@@ -94,10 +81,10 @@ public class AccountController {
 
 
     @RequestMapping(path = "/api/v1/public/user/sign_in", method = RequestMethod.POST)
-    public AuthStatus signInUser(@RequestBody SignInUser signInUser) {
+    public AuthStatus signInUser(@RequestBody User user) {
 
-        String email = signInUser.getEmail();
-        String password = signInUser.getPassword();
+        String email = user.getEmail();
+        String password = user.getPassWord();
 
         if (!validatorService.isValidEmail(email) || !validatorService.isValidPassword(password)) {
             throw new InvalidInputException();

@@ -1,10 +1,7 @@
 package com.ccet.backend.api.v1.services.assignments;
 
-import com.ccet.backend.api.v1.models.commonmodels.assignments.Assignment;
-import com.ccet.backend.api.v1.models.commonmodels.assignments.Assignments;
-import com.ccet.backend.api.v1.models.user.UserDetail;
-import com.ccet.backend.api.v1.repository.AssignmentsRepository;
-import com.ccet.backend.api.v1.repository.UserRepository;
+import com.ccet.backend.api.v1.hibernate.entities.Assignment;
+import com.ccet.backend.api.v1.hibernate.repositories.AssignmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,23 +11,18 @@ import java.util.List;
 @Service
 public class AssignmentsService {
 
-    private UserRepository userRepository;
-    private AssignmentsRepository assignmentsRepository;
+    private AssignmentRepository assignmentRepository;
 
     @Autowired
-    public AssignmentsService(UserRepository userRepository, AssignmentsRepository assignmentsRepository) {
-        this.userRepository = userRepository;
-        this.assignmentsRepository = assignmentsRepository;
+    public AssignmentsService(AssignmentRepository assignmentRepository) {
+
+        this.assignmentRepository = assignmentRepository;
     }
 
-    public Assignments getAssignments(int user_id) {
-        UserDetail userDetail = userRepository.getUserDetail(user_id);
-        String admissionYear = userDetail.getAdmissionYear();
-        int admissionSemester = userDetail.getAdmissionSemester();
+    public List<Assignment> getAssignments(int semester) {
 
-        int currentSemester = getCurrentSemester(Integer.parseInt(admissionYear), admissionSemester);
-        List<Assignment> assignments = assignmentsRepository.getAssignments(currentSemester);
-        return new Assignments(assignments);
+        return assignmentRepository.getAssignments(semester);
+
     }
 
     public int getCurrentSemester(int admissionYear, int admissionSem) {

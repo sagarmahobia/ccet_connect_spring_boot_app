@@ -1,11 +1,35 @@
-package com.ccet.backend.api.v1.models.commonmodels.assignments;
+package com.ccet.backend.api.v1.hibernate.entities;
 
+
+import javax.persistence.*;
+
+@Entity
 public class Assignment {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "semester")
     private int semester;
+
+    @Column(name = "assignment_no")
     private int assignmentNo;
+
+    @Column(name = "last_date")
     private String lastDate;
+
+    @Column(name = "link")
     private String link;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getSemester() {
         return semester;
