@@ -1,6 +1,7 @@
 package com.ccet.backend.api.v1;
 
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -31,6 +32,7 @@ public class Config {
     }
 
     @Bean
+    @Qualifier(value = "mail")
     public TaskExecutor getTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(1);

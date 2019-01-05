@@ -1,10 +1,9 @@
 package com.ccet.backend.api.v1.controllers;
 
-import com.ccet.backend.api.v1.jwtsecurity.model.JwtUserDetails;
+import com.ccet.backend.api.v1.exceptions.InvalidInputException;
 import com.ccet.backend.api.v1.models.commonmodels.assignments.Assignments;
 import com.ccet.backend.api.v1.services.assignments.AssignmentsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,12 +22,13 @@ public class AssignmentsController {
     }
 
     @RequestMapping(path = "/api/v1/protected/assignments")
-    public Assignments getAssignmentsBySemAndNo(
-            Authentication authentication) {
+    public Assignments getAssignmentsBySemAndNo(Assignments assignments) {
 
-        JwtUserDetails subject = (JwtUserDetails) authentication.getPrincipal();
-        int user_id =  subject.getId();
+        if (assignments.getSem() == 0) {
+            throw new InvalidInputException();
+        }
 
-        return assignmentsService.getAssignments(user_id);
+        return new Assignments(assignmentsService.getAssignments(assignments.getSem()));
+
     }
 }

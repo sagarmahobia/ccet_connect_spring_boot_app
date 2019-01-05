@@ -7,14 +7,12 @@ import java.util.Collection;
 
 public class JwtUserDetails implements UserDetails {
 
-    private final String firstName;
-    private final String lastName;
+
     private int id;
 
 
     public JwtUserDetails(JwtUser jwtUser) {
-        this.firstName = jwtUser.getFirstName();
-        this.lastName = jwtUser.getLastName();
+
         this.id = jwtUser.getId();
     }
 
@@ -30,15 +28,7 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return firstName + " " + lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
+        return "";
     }
 
     public int getId() {
