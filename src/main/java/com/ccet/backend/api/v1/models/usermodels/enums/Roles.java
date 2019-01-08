@@ -6,7 +6,6 @@
 package com.ccet.backend.api.v1.models.usermodels.enums;
 
 /**
- *
  * @author SAGAR MAHOBIA
  */
 public enum Roles {
@@ -42,5 +41,9 @@ public enum Roles {
             }
         }
         return Other;
+    }
+
+    public String getRole() {
+        return this.toString().toUpperCase();
     }
 }

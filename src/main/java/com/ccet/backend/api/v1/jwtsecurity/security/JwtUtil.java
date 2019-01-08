@@ -25,8 +25,9 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
-            jwtUser = new JwtUser();
-            jwtUser.setId(Integer.parseInt(body.getSubject()));
+            int id = Integer.parseInt((String) body.get("id"));
+            String role = (String) body.get("role");
+            jwtUser = new JwtUser(id, role);
         } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException ignored) {
             //todo handle error.
         }
@@ -36,8 +37,12 @@ public class JwtUtil {
 
     public String generate(JwtUser jwtUser) {
 
-        Claims claims = Jwts.claims().setSubject(String.valueOf(jwtUser.getId()));
 
+        Claims claims = Jwts.claims();
+        claims.setIssuer("CCET");
+
+        claims.put("id", String.valueOf(jwtUser.getId()));
+        claims.put("role", jwtUser.getRole());
 
         return Jwts.builder()
                 .setClaims(claims)

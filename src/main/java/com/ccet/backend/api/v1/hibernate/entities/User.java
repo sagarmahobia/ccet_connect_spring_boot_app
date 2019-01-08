@@ -15,6 +15,9 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "role_id")
+    private int roleId;
+
     @Column(name = "college_email")
     private String collegeEmail;
 
@@ -62,5 +65,13 @@ public class User {
 
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+
+    public int getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
     }
 }

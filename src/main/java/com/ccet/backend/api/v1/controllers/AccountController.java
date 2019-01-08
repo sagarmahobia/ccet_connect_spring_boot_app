@@ -13,6 +13,7 @@ import com.ccet.backend.api.v1.hibernate.entities.User;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtUtil;
 import com.ccet.backend.api.v1.models.commonmodels.AuthStatus;
+import com.ccet.backend.api.v1.models.usermodels.enums.Roles;
 import com.ccet.backend.api.v1.services.ValidatorService;
 import com.ccet.backend.api.v1.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class AccountController {
     @RequestMapping(path = "/api/v1/public/user/sign_up", method = RequestMethod.POST)
     public Otp signUp(@RequestBody User user) {
         user.setId(0);
+        user.setRoleId(Roles.Other.getRoleId());
         user.setVerified(false);
         String email = user.getEmail();
         String passWord = user.getPassWord();

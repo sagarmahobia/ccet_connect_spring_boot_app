@@ -1,6 +1,7 @@
 package com.ccet.backend.api.v1.jwtsecurity.model;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -9,17 +10,20 @@ public class JwtUserDetails implements UserDetails {
 
 
     private int id;
+    private Collection<GrantedAuthority> authorities;
 
 
     public JwtUserDetails(JwtUser jwtUser) {
 
         this.id = jwtUser.getId();
+        authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(jwtUser.getRole());
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public Collection<GrantedAuthority> getAuthorities() {
+        return authorities;
     }
+
 
     @Override
     public String getPassword() {
@@ -28,7 +32,7 @@ public class JwtUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return null;
     }
 
     public int getId() {
