@@ -9,6 +9,7 @@ import com.ccet.backend.api.v1.exceptions.InvalidInputException;
 import com.ccet.backend.api.v1.hibernate.entities.Otp;
 import com.ccet.backend.api.v1.hibernate.entities.User;
 import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
+import com.ccet.backend.api.v1.models.usermodels.enums.Roles;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -96,10 +97,10 @@ public class UserRepository {
 
         User result = resultList.get(0);
 
-        JwtUser jwtUser = new JwtUser();//todo check null
+        int id = result.getId();
+        String role = Roles.getRole(result.getRoleId()).getRole();
 
-        jwtUser.setId(result.getId());
-
+        JwtUser jwtUser = new JwtUser(id, role);//todo check null
         return jwtUser;
 
     }
@@ -112,9 +113,9 @@ public class UserRepository {
 
         User userDetail = getUserDetail(userId);
         if (userDetail != null) {
-            JwtUser jwtUser = new JwtUser();
-            jwtUser.setId(userId);
-            return jwtUser;
+            int id = userDetail.getId();
+            String role = Roles.getRole(userDetail.getRoleId()).getRole();
+            return new JwtUser(id, role);
         }
         return null;
     }
@@ -123,6 +124,6 @@ public class UserRepository {
 
         Session session = sessionFactory.getCurrentSession();
         session.delete(otp);
-         
+
     }
 }

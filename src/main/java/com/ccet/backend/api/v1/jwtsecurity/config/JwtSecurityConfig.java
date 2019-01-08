@@ -4,6 +4,7 @@ import com.ccet.backend.api.v1.jwtsecurity.security.JwtAuthenticationEntryPoint;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtAuthenticationProvider;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtAuthenticationTokenFilter;
 import com.ccet.backend.api.v1.jwtsecurity.security.JwtSuccessHandler;
+import com.ccet.backend.api.v1.models.usermodels.enums.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +50,14 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.csrf().disable().authorizeRequests().antMatchers("/api/v1/protected/**").authenticated()
+        http.csrf().disable().authorizeRequests()
+                .antMatchers("/api/v1/protected/hod/**").hasAuthority(Roles.HOD.getRole())
+                .antMatchers("/api/v1/protected/faculty/**").hasAuthority(Roles.Faculty.getRole())
+                .antMatchers("/api/v1/protected/management/**").hasAuthority(Roles.Management.getRole())
+                .antMatchers("/api/v1/protected/student/**").hasAuthority(Roles.Student.getRole())
+                .antMatchers("/api/v1/protected/admin/**").hasAuthority(Roles.Admin.getRole())
+                .antMatchers("/api/v1/protected/other/**").hasAuthority(Roles.Other.getRole())
+                .antMatchers("/api/v1/protected/**").authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(entryPoint)
                 .and()
