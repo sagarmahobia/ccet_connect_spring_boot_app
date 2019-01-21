@@ -36,10 +36,7 @@ public class AssignmentRepository {
         CriteriaQuery<Assignment> criteria = builder.createQuery(Assignment.class);
         Root<Assignment> from = criteria.from(Assignment.class);//todo test with or without
         criteria.select(from);
-
-        criteria.where(builder.equal(from.get("semester"), semester));
-        criteria.where(builder.equal(from.get("branchId"), branchId));
-        
+        criteria.where(builder.equal(from.get("semester"), semester), builder.equal(from.get("branchId"), branchId));
         return session.createQuery(criteria).getResultList();
 
     }

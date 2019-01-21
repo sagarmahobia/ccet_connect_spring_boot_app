@@ -26,9 +26,10 @@ public class AssignmentRepositoryTest {
         assignment.setAssignmentNo(1);
         assignment.setLastDate("fdsfsadf");
         assignment.setLink("fdsfsdf");
+        assignment.setBranchId(1);
 
         assignmentRepository.addAssignment(assignment);
-        List<Assignment> assignments = assignmentRepository.getAssignments(4);
+        List<Assignment> assignments = assignmentRepository.getAssignments(1, 4);
         Assert.assertEquals(1, assignments.size());
 
     }

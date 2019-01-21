@@ -1,10 +1,13 @@
 package com.ccet.backend.api.v1.controllers;
 
 import com.ccet.backend.api.v1.exceptions.InvalidInputException;
+import com.ccet.backend.api.v1.hibernate.entities.Assignment;
 import com.ccet.backend.api.v1.models.commonmodels.assignments.Assignments;
 import com.ccet.backend.api.v1.services.assignments.AssignmentsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,14 +24,14 @@ public class AssignmentsController {
         this.assignmentsService = assignmentsService;
     }
 
-    @RequestMapping(path = "/api/v1/protected/assignments")
-    public Assignments getAssignmentsBySemAndNo(Assignments assignments) {
+    @RequestMapping(path = "/api/v1/public/assignments", method = RequestMethod.POST)
+    public Assignments getAssignmentsBySemAndNo(@RequestBody Assignment assignments) {
 
-        if (assignments.getSem() == 0) {
+        if (assignments.getSemester() == 0 || assignments.getBranchId() == 0) {
             throw new InvalidInputException();
         }
 
-        return new Assignments(assignmentsService.getAssignments(assignments.getBranchId(), assignments.getSem()));
+        return new Assignments(assignmentsService.getAssignments(assignments.getBranchId(), assignments.getSemester()));
 
     }
 }
