@@ -28,7 +28,7 @@ public class AssignmentsController {
             throw new InvalidInputException();
         }
 
-        return new Assignments(assignmentsService.getAssignments(assignments.getSem()));
+        return new Assignments(assignmentsService.getAssignments(assignments.getBranchId(), assignments.getSem()));
 
     }
 }

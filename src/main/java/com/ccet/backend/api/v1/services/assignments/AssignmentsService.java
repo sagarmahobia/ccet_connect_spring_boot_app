@@ -19,9 +19,9 @@ public class AssignmentsService {
         this.assignmentRepository = assignmentRepository;
     }
 
-    public List<Assignment> getAssignments(int semester) {
+    public List<Assignment> getAssignments(int branchId, int semester) {
 
-        return assignmentRepository.getAssignments(semester);
+        return assignmentRepository.getAssignments(branchId, semester);
 
     }
 

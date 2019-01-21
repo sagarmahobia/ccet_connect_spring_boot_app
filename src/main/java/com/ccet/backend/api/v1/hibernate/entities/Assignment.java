@@ -11,6 +11,9 @@ public class Assignment {
     @Column(name = "id")
     private int id;
 
+    @Column(name = "branch_id")
+    private int branchId;
+
     @Column(name = "semester")
     private int semester;
 
@@ -63,4 +66,11 @@ public class Assignment {
         this.link = link;
     }
 
+    public int getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(int branchId) {
+        this.branchId = branchId;
+    }
 }

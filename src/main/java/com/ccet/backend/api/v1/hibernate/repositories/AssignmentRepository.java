@@ -29,7 +29,7 @@ public class AssignmentRepository {
 
     }
 
-    public List<Assignment> getAssignments(int semester) {
+    public List<Assignment> getAssignments(int branchId, int semester) {
         Session session = sessionFactory.getCurrentSession();
 
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -38,7 +38,8 @@ public class AssignmentRepository {
         criteria.select(from);
 
         criteria.where(builder.equal(from.get("semester"), semester));
-
+        criteria.where(builder.equal(from.get("branchId"), branchId));
+        
         return session.createQuery(criteria).getResultList();
 
     }
