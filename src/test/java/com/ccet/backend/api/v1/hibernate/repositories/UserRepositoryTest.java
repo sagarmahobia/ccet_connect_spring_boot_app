@@ -24,7 +24,7 @@ public class UserRepositoryTest {
     public void testSaveUser() {
         User user = new User();
         user.setEmail("sagar@gmail.com");
-        user.setVerified(false);
+        user.setVerifiedEmail(false);
         user.setPassWord("Password");
         id = userRepository.saveUser(user);
     }
@@ -80,7 +80,7 @@ public class UserRepositoryTest {
     public void testSetVerified() {
         testSaveUser();
         testSaveUser();
-        userRepository.setVerified(id);
+        userRepository.setVerifiedEmail(id);
     }
 
     @Test

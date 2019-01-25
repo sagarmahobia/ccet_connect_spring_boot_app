@@ -24,8 +24,8 @@ public class User {
     @Column(name = "password")
     private String passWord;
 
-    @Column(name = "verified")
-    private boolean verified;
+    @Column(name = "verified_email")
+    private boolean verifiedEmail;
 
     public int getId() {
         return id;
@@ -59,12 +59,12 @@ public class User {
         this.passWord = passWord;
     }
 
-    public boolean isVerified() {
-        return verified;
+    public boolean isVerifiedEmail() {
+        return verifiedEmail;
     }
 
-    public void setVerified(boolean verified) {
-        this.verified = verified;
+    public void setVerifiedEmail(boolean verifiedEmail) {
+        this.verifiedEmail = verifiedEmail;
     }
 
     public int getRoleId() {

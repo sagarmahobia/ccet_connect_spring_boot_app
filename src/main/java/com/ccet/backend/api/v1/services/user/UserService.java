@@ -61,7 +61,7 @@ public class UserService {
             throw new InvalidCredentialsException();
         }
         userRepository.removeOtp(otp);
-        userRepository.setVerified(userId);
+        userRepository.setVerifiedEmail(userId);
         return userId;
 
     }

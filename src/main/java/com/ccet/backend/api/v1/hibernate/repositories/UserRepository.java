@@ -73,10 +73,10 @@ public class UserRepository {
 
     }
 
-    public void setVerified(int userId) {
+    public void setVerifiedEmail(int userId) {
         Session session = sessionFactory.getCurrentSession();
         User user = session.get(User.class, userId);
-        user.setVerified(true);
+        user.setVerifiedEmail(true);
         session.save(user);
     }
 
@@ -96,12 +96,13 @@ public class UserRepository {
         }
 
         User result = resultList.get(0);
-
+        if (!result.isVerifiedEmail()) {
+            return null;
+        }
         int id = result.getId();
         String role = Roles.getRole(result.getRoleId()).getRole();
 
-        JwtUser jwtUser = new JwtUser(id, role);//todo check null
-        return jwtUser;
+        return new JwtUser(id, role);
 
     }
 

@@ -44,7 +44,7 @@ public class AccountController {
     public Otp signUp(@RequestBody User user) {
         user.setId(0);
         user.setRoleId(Roles.Other.getRoleId());
-        user.setVerified(false);
+        user.setVerifiedEmail(false);
         String email = user.getEmail();
         String passWord = user.getPassWord();
 
@@ -58,6 +58,11 @@ public class AccountController {
     @RequestMapping(path = "/api/v1/public/user/verify_otp", method = RequestMethod.POST)
     public AuthStatus verifyOtp(@RequestBody Otp otp) {
         String otpString = otp.getOtp();
+        int otpId = otp.getId();
+
+        if (otpId <= 0) {
+            throw new InvalidInputException();
+        }
 
         try {
             Integer.parseInt(otpString);
