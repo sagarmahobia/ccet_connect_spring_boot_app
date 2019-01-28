@@ -3,7 +3,6 @@ package com.ccet.backend.api.v1.hibernate.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "otp")
 public class Otp {
 
     @Id

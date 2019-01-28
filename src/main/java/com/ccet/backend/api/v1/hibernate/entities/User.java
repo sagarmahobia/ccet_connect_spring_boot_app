@@ -4,7 +4,6 @@ package com.ccet.backend.api.v1.hibernate.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
 public class User {
 
     @Id
