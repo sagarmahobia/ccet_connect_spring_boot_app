@@ -3,7 +3,6 @@ package com.ccet.backend.api.v1.hibernate.repositories;
 import com.ccet.backend.BackendApplication;
 import com.ccet.backend.api.v1.hibernate.entities.Otp;
 import com.ccet.backend.api.v1.hibernate.entities.User;
-import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +18,7 @@ public class UserRepositoryTest {
     UserRepository userRepository;
 
     private int id;
+    private User user;
     private int otpId;
 
     public void testSaveUser() {
@@ -26,17 +26,20 @@ public class UserRepositoryTest {
         user.setEmail("sagar@gmail.com");
         user.setVerifiedEmail(false);
         user.setPassWord("Password");
-        id = userRepository.saveUser(user);
+        userRepository.saveUser(user);
+        id = user.getId();
+        this.user = user;
     }
 
     public void testSaveOtp() {
         testSaveUser();
         Otp otp = new Otp();
-        otp.setUserId(id);
+        otp.setUser(user);
         otp.setOtp("4545");
         otpId = userRepository.saveOtp(otp);
     }
 
+    //working
     public void testRemoveOtp() {
         testSaveOtp();
         Otp otp = new Otp();
@@ -44,29 +47,30 @@ public class UserRepositoryTest {
         userRepository.removeOtp(otp);
     }
 
+    //done
     public void testVerifyOtp() {
         testSaveOtp();
         Otp otp2 = new Otp();
 
         otp2.setId(otpId);
         otp2.setOtp("4546");
-        Assert.assertEquals(userRepository.verifyOtp(otp2), -1);
+        Assert.assertNull(userRepository.verifyOtp(otp2));
 
         otp2.setId(otpId + 200);
         otp2.setOtp("4546");
-        Assert.assertEquals(userRepository.verifyOtp(otp2), -1);
+        Assert.assertNull(userRepository.verifyOtp(otp2));
 
         Otp otp = new Otp();
         otp.setId(otpId);
         otp.setOtp("4545");
-        Assert.assertEquals(userRepository.verifyOtp(otp), id);
+        Assert.assertNotNull(userRepository.verifyOtp(otp));
 
     }
 
-    @Test()
+    @Test
     public void testIncrementAttempts() {
         Otp otp = new Otp();
-        otp.setUserId(id);
+        otp.setUser(user);
         otp.setOtp("4545");
         otpId = userRepository.saveOtp(otp);
 
@@ -80,26 +84,27 @@ public class UserRepositoryTest {
     public void testSetVerified() {
         testSaveUser();
         testSaveUser();
-        userRepository.setVerifiedEmail(id);
+        userRepository.setVerifiedEmail(user);
     }
 
     @Test
     public void testVerifySignInCreds() {
         testSaveUser();
+        userRepository.setVerifiedEmail(user);
 
         Assert.assertNull(userRepository.verifySignInCreds("wsagar@gmail.com", "wPassword"));
         Assert.assertNull(userRepository.verifySignInCreds("wsagar@gmail.com", "Password"));
         Assert.assertNull(userRepository.verifySignInCreds("sagar@gmail.com", "wPassword"));
-        Assert.assertEquals(userRepository.verifySignInCreds("sagar@gmail.com", "Password").getId(), id);
+        Assert.assertEquals(userRepository.verifySignInCreds("sagar@gmail.com", "Password").getId(), user.getId());
 
     }
 
     @Test()
     public void testGetJwtUser() {
-        testSaveUser();
-        Assert.assertNull(userRepository.getJwtUser(-id));
+        testVerifyOtp();
+        Assert.assertNull(userRepository.getUserDetail(-id));
 
-        JwtUser jwtUser = userRepository.getJwtUser(id);
+        User jwtUser = userRepository.getUserDetail(id);
         Assert.assertEquals(jwtUser.getId(), id);
     }
 

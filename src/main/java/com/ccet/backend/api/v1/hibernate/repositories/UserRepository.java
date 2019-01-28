@@ -8,8 +8,6 @@ package com.ccet.backend.api.v1.hibernate.repositories;
 import com.ccet.backend.api.v1.exceptions.InvalidInputException;
 import com.ccet.backend.api.v1.hibernate.entities.Otp;
 import com.ccet.backend.api.v1.hibernate.entities.User;
-import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
-import com.ccet.backend.api.v1.models.usermodels.enums.Roles;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -36,10 +34,9 @@ public class UserRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    public int saveUser(User user) {
+    public void saveUser(User user) {
         Session session = sessionFactory.getCurrentSession();
-        return (Integer) session.save(user);
-
+        session.save(user);
     }
 
     public int saveOtp(Otp otp) {
@@ -47,17 +44,17 @@ public class UserRepository {
         return (Integer) session.save(otp);
     }
 
-    public int verifyOtp(Otp otp) {
+    public User verifyOtp(Otp otp) {
 
         Session session = sessionFactory.getCurrentSession();
         Otp dbOtp = session.get(Otp.class, otp.getId());
         if (dbOtp == null) {
-            return -1;
+            return null;
         }
         if (dbOtp.getOtp().equalsIgnoreCase(otp.getOtp())) {
-            return dbOtp.getUserId();
+            return dbOtp.getUser();
         } else {
-            return -1;
+            return null;
         }
     }
 
@@ -66,21 +63,20 @@ public class UserRepository {
         Otp dbOtp = session.get(Otp.class, otpId);
         if (dbOtp != null) {
             dbOtp.setAttempts(dbOtp.getAttempts() + 1);
-            session.save(dbOtp);
+            session.update(dbOtp);
         } else {
             throw new InvalidInputException();
         }
 
     }
 
-    public void setVerifiedEmail(int userId) {
+    public void setVerifiedEmail(User user) {
         Session session = sessionFactory.getCurrentSession();
-        User user = session.get(User.class, userId);
         user.setVerifiedEmail(true);
-        session.save(user);
+        session.update(user);
     }
 
-    public JwtUser verifySignInCreds(String email, String password) {
+    public User verifySignInCreds(String email, String password) {
 
         Session session = sessionFactory.getCurrentSession();
 
@@ -99,10 +95,7 @@ public class UserRepository {
         if (!result.isVerifiedEmail()) {
             return null;
         }
-        int id = result.getId();
-        String role = Roles.getRole(result.getRoleId()).getRole();
-
-        return new JwtUser(id, role);
+        return result;
 
     }
 
@@ -110,16 +103,6 @@ public class UserRepository {
         return sessionFactory.getCurrentSession().get(User.class, userId);
     }
 
-    public JwtUser getJwtUser(int userId) {
-
-        User userDetail = getUserDetail(userId);
-        if (userDetail != null) {
-            int id = userDetail.getId();
-            String role = Roles.getRole(userDetail.getRoleId()).getRole();
-            return new JwtUser(id, role);
-        }
-        return null;
-    }
 
     public void removeOtp(Otp otp) {
 

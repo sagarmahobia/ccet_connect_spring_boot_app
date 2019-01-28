@@ -74,9 +74,13 @@ public class AccountController {
             throw new InvalidInputException();
         }
 
-        int id = userService.verifyOtp(otp);
+        User user = userService.verifyOtp(otp);
 
-        String token = jwtUtil.generate(userService.getUserDetail(id));
+        int id = user.getId();
+        String role = Roles.getRole(user.getRoleId()).getRole();
+        JwtUser jwtUser = new JwtUser(id, role);
+
+        String token = jwtUtil.generate(jwtUser);
         if (token == null) {
             throw new InternalServerException("jwtUtil.generate(token) failed");
         }
@@ -97,10 +101,14 @@ public class AccountController {
             throw new InvalidInputException();
         }
 
-        JwtUser jwtUser = userService.signInUser(email, password);
-        if (jwtUser == null) {
+        User userDB = userService.signInUser(email, password);
+        if (userDB == null) {
             throw new UserNotFoundException();
         }
+        int id = userDB.getId();
+        String role = Roles.getRole(userDB.getRoleId()).getRole();
+        JwtUser jwtUser = new JwtUser(id, role);
+
 
         AuthStatus authStatus = new AuthStatus();
         authStatus.setToken(jwtUtil.generate(jwtUser));

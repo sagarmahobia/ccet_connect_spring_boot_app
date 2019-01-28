@@ -6,11 +6,9 @@
 package com.ccet.backend.api.v1.services.user;
 
 import com.ccet.backend.api.v1.exceptions.InvalidCredentialsException;
-import com.ccet.backend.api.v1.exceptions.UnknownDatabaseException;
 import com.ccet.backend.api.v1.hibernate.entities.Otp;
 import com.ccet.backend.api.v1.hibernate.entities.User;
 import com.ccet.backend.api.v1.hibernate.repositories.UserRepository;
-import com.ccet.backend.api.v1.jwtsecurity.model.JwtUser;
 import com.ccet.backend.api.v1.services.mail.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,47 +31,39 @@ public class UserService {
     }
 
     public Otp signUpUser(User user) {
-        int userId = userRepository.saveUser(user);
+        userRepository.saveUser(user);
 
-        if (userId != -1) {
-            String newOtp = String.format("%04d", new Random().nextInt(10000));
+        String newOtp = String.format("%04d", new Random().nextInt(10000));
 
-            Otp otp = new Otp();
-            otp.setUserId(userId);
-            otp.setOtp(newOtp);
+        Otp otp = new Otp();
+        otp.setUser(user);
+        otp.setOtp(newOtp);
 
-            int i = userRepository.saveOtp(otp);
-            mailService.sendOtp(user.getEmail(), newOtp);//sends mail
+        int i = userRepository.saveOtp(otp);
+        mailService.sendOtp(user.getEmail(), newOtp);//sends mail
 
-            Otp otp2 = new Otp();
-            otp2.setId(i);
-            return otp2;
-        } else {
-            throw new UnknownDatabaseException();
-        }
-
+        Otp otp2 = new Otp();
+        otp2.setId(i);
+        return otp2;
     }
 
-    public int verifyOtp(Otp otp) {
-        int userId = userRepository.verifyOtp(otp);
-        if (userId == -1) {
+    public User verifyOtp(Otp otp) {
+        User user = userRepository.verifyOtp(otp);
+        if (user == null) {
             userRepository.incrementAttempts(otp.getId());
             throw new InvalidCredentialsException();
         }
         userRepository.removeOtp(otp);
-        userRepository.setVerifiedEmail(userId);
-        return userId;
+        userRepository.setVerifiedEmail(user);
+        return user;
 
     }
 
 
-    public JwtUser signInUser(String email, String password) {
+    public User signInUser(String email, String password) {
 
         return userRepository.verifySignInCreds(email, password);
     }
 
 
-    public JwtUser getUserDetail(int id) {
-        return userRepository.getJwtUser(id);
-    }
 }
